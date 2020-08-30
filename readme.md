@@ -12,7 +12,6 @@ Design Goal
 Persistent Data Design Goal
 ---
 1. Default data store will be PostgresSQL
-2. Designed to extend store to other data store
 
 
 UI
