@@ -1,0 +1,32 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: goshop_local_postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-D3cr4t@32^35@8om3}
+      PGDATA: /data/postgres
+    volumes:
+      - ./pgdata:/data/postgres
+    ports:
+      - "${PGSQL_PORT:-5432}:5432"
+    networks:
+      - go-shop
+  pgadmin:
+    container_name: local_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@vikesh.net}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-3cr3t4685@23}
+    volumes:
+      - ./pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - go-shop
+
+networks:
+  go-shop:
+    driver: bridge

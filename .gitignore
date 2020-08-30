@@ -1,0 +1,9 @@
+.idea/
+goshop.iml
+pgdata/
+pgadmin/
+log
+logs
+log.json
+./goshop
+goshop

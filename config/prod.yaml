@@ -1,0 +1,3 @@
+development: true
+database: 'postgres://goshop:goshop@localhost:5432/goshop'
+listenOnPort: '127.0.0.1:8080'
