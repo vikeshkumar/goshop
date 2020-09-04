@@ -1,6 +1,12 @@
-development: true
-database: 'postgres://goshop:goshop@localhost:5432/goshop'
-listenOnPort: '127.0.0.1:8080'
-templateDirectory: '/home/vikesh/go/src/net.vikesh/goshop/templates/*'
-writeTimeout: 10
-readTimeout: 5
+serverConfiguration:
+  development: true
+  listenOnPort: '127.0.0.1:8080'
+  writeTimeout: 10
+  readTimeout: 5
+dbConfig:
+  url: 'postgres://goshop:goshop@localhost:5432/goshop'
+templateConfiguration:
+  parseOnce: false
+  staticFileDirectory: '/home/vikesh/go/src/net.vikesh/goshop/_ui/'
+  templateDirectory: '/home/vikesh/go/src/net.vikesh/goshop/templates/'
+  favicon: '/home/vikesh/go/src/net.vikesh/goshop/_ui/favicon.ico'

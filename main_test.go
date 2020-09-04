@@ -15,9 +15,9 @@ func Test_bootstrap(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			configuration, err := bootstrap(tt.path)
+			_, err := bootstrap(tt.path)
 			if tt.error {
-				if configuration != nil || err == nil {
+				if err == nil {
 					t.Errorf("expected nil configuration and error")
 				}
 			}

@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"github.com/jackc/pgx"
-	"github.com/jackc/pgx/pgxpool"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"reflect"
 	"testing"
 )
