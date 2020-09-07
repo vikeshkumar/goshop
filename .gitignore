@@ -2,7 +2,7 @@
 goshop.iml
 pgdata/
 pgadmin/
-log
+logger
 logs
 log.json
 ./goshop

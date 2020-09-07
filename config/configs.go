@@ -28,6 +28,7 @@ type DBConfig struct {
 type TemplateConfiguration struct {
 	ParseOnce         bool              `yaml:"parseOnce"`
 	TemplateDirectory string            `yaml:"templateDirectory"`
+	Suffix            string            `yaml:"suffix"`
 	Favicon           string            `yaml:"favicon"`
 	Templates         map[string]string `yaml:"templates"`
 }

@@ -8,7 +8,6 @@ require (
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.8.1
-	github.com/prometheus/common v0.13.0 // indirect
 	go.uber.org/zap v1.15.0
 	gopkg.in/yaml.v2 v2.3.0
 )

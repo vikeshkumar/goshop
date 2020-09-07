@@ -2,13 +2,11 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"github.com/gorilla/mux"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
 	c "net.vikesh/goshop/config"
 	"net.vikesh/goshop/db"
 	"net.vikesh/goshop/handlers"
@@ -20,34 +18,12 @@ import (
 	"time"
 )
 
-var log = zap.NewExample()
+var logger = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
 
 func main() {
-	rawJSON := []byte(`{
-		"level": "debug",
-		"encoding": "json",
-		"outputPaths": ["stdout", "./logs"],
-		"errorOutputPaths": ["stderr", "./logs"],
-		"callerKey": "caller",
-		"encoderConfig": {
-		  "messageKey": "message",
-		  "levelKey": "level",
-		  "levelEncoder": "lowercase"
-		}
-	  }`)
-	var cfg zap.Config
-	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
-		panic(err)
-	}
-	cfg.EncoderConfig.EncodeCaller = zapcore.FullCallerEncoder
-	log, err := cfg.Build()
-	if err != nil {
-		panic(err)
-	}
-	defer log.Sync()
 	config, err := bootstrap(string(c.DefaultConfigurationPath))
 	if err != nil {
-		log.Error("error reading required configuration file", zap.Error(err))
+		logger.Printf("error reading required configuration file %v", err)
 		os.Exit(1)
 	}
 	//configuring URL handlers
@@ -58,9 +34,9 @@ func main() {
 	r.PathPrefix("/_ui/").Handler(http.StripPrefix("/_ui/", http.FileServer(http.Dir(dir))))
 	dynamicViews := handlers.CreateHandlers(config.TemplateConfiguration)
 	for pattern, handlerFunc := range dynamicViews {
-		log.Info("creating handler with path",
-			zap.String("pattern", pattern),
-			zap.String("function", runtime.FuncForPC(reflect.ValueOf(handlerFunc).Pointer()).Name()))
+		logger.Printf("creating handler with path = %v, function = %v",
+			pattern,
+			runtime.FuncForPC(reflect.ValueOf(handlerFunc).Pointer()).Name())
 		r.HandleFunc(pattern, handlerFunc)
 	}
 	r.Schemes("http")
@@ -83,15 +59,14 @@ func main() {
 	if err != nil {
 		log.Fatal(
 			"failed to connect to database",
-			zap.Any("error", err),
+			err,
 		)
-		os.Exit(1)
 	}
 	if p != nil {
 		defer p.Close()
 	}
 	if err := srv.ListenAndServe(); err != nil {
-		log.Error("err", zap.Error(err))
+		logger.Printf("err = %v", err)
 	}
 }
 
@@ -99,10 +74,11 @@ func main() {
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Do stuff here
-		log.Info(r.RequestURI,
-			zap.Any("method", r.Method),
-			zap.Any("remote", r.RemoteAddr),
-			zap.Any("proto", r.Proto),
+		logger.Printf("request url = %v, method = %v, remote = %v, protocol =%v",
+			r.RequestURI,
+			r.Method,
+			r.RemoteAddr,
+			r.Proto,
 		)
 		next.ServeHTTP(w, r)
 	})
@@ -114,7 +90,7 @@ func listenForShutDown(ch chan os.Signal, srv *http.Server, wait time.Duration) 
 	<-ch
 	ctx, cancel := context.WithTimeout(context.Background(), wait)
 	defer cancel()
-	log.Info("shutting down", zap.Any("signal", ctx))
+	logger.Printf("shutting down, received signal = %v", ctx)
 	_ = srv.Shutdown(ctx)
 	os.Exit(0)
 }
@@ -124,24 +100,24 @@ func bootstrap(configPath string) (c.Configuration, error) {
 	b, err := ioutil.ReadFile(configPath)
 	config := c.Configuration{}
 	if err != nil {
-		log.Error("failed to read configuration file, default is config/local.yaml relative to the executable",
-			zap.Error(err),
+		log.Println("failed to read configuration file, default is config/local.yaml relative to the executable",
+			err,
 		)
 		return config, err
 	}
-	log.Debug("opened config file for reading",
-		zap.String("filename", configPath),
+	logger.Printf("opened config file for reading, configPath = %v",
+		configPath,
 	)
 	marshalError := yaml.Unmarshal(b, &config)
 	if marshalError != nil {
-		log.Error("marshalling error",
-			zap.Error(marshalError),
+		log.Println("marshalling error",
+			marshalError,
 		)
 		return config, marshalError
 	}
-	log.Debug(
-		"development set to : ",
-		zap.Bool("development", config.ServerConfiguration.Development),
+	logger.Printf(
+		"development set to : %v",
+		config.ServerConfiguration.Development,
 	)
 	return config, nil
 }

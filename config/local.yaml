@@ -9,4 +9,5 @@ templateConfiguration:
   parseOnce: false
   staticFileDirectory: '/home/vikesh/go/src/net.vikesh/goshop/_ui/'
   templateDirectory: '/home/vikesh/go/src/net.vikesh/goshop/templates/'
+  suffix: '.gohtml'
   favicon: '/home/vikesh/go/src/net.vikesh/goshop/_ui/favicon.ico'

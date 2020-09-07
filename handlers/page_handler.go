@@ -1,15 +1,15 @@
 package handlers
 
 import (
-	"go.uber.org/zap"
 	"html/template"
+	"log"
 	"net.vikesh/goshop/config"
 	"net/http"
 	"os"
 	"sync"
 )
 
-var log = zap.NewExample()
+var logger = log.New(os.Stdout, "", log.Llongfile)
 
 var templates = make(map[string]*template.Template)
 var templateLock sync.Mutex
@@ -33,13 +33,13 @@ func CreateHandlers(c config.TemplateConfiguration) map[string]http.HandlerFunc 
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	s, se := os.Stat(tc.Favicon)
 	if se != nil {
-		log.Error("error reading stat of file", zap.Error(se))
+		log.Println("error reading stat of file", se)
 		w.WriteHeader(404)
 		return
 	}
 	f, e := os.Open(tc.Favicon)
 	if e != nil {
-		log.Error("error reading file", zap.Error(e))
+		log.Println("error reading file", e)
 		w.WriteHeader(404)
 		return
 	}
@@ -55,11 +55,11 @@ type page struct {
 func parse(path string) (*template.Template, error) {
 	re := tc.ParseOnce
 	if !re {
-		tpl, err := template.ParseGlob(path)
+		tpl, err := template.ParseGlob(join(path))
 		return tpl, err
 	}
 	if _, ok := templates[path]; !ok {
-		tpl, err := template.ParseGlob(path)
+		tpl, err := template.ParseGlob(join(path))
 		if err != nil {
 			return nil, err
 		} else {
@@ -69,4 +69,8 @@ func parse(path string) (*template.Template, error) {
 		}
 	}
 	return templates[path], nil
+}
+
+func join(path string) string {
+	return tc.TemplateDirectory + path + tc.Suffix
 }

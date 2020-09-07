@@ -1,19 +1,18 @@
 package handlers
 
 import (
-	"go.uber.org/zap"
 	"net/http"
 )
 
-var home = tc.TemplateDirectory + "/index.gohtml"
+var home = "index"
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	homeTemplate, err := parse(home)
 	if err != nil {
-		log.Error("error parsing", zap.Any("error", err))
+		logger.Printf("error parsing %v", err)
 	}
 	execError := homeTemplate.Execute(w, &page{"vikesh.net", "hello"})
 	if execError != nil {
-		log.Error("error executing template")
+		logger.Printf("error executing template %v", execError)
 	}
 }
